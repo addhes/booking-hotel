@@ -5,13 +5,15 @@ import { IoClose, IoMenu } from "react-icons/io5";
 
 import cslx from "clsx";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
 
 const navlink = () => {
   const [open, setOpen] = useState(false);
+  const { data: session } = useSession();
   return (
     <>
       <button
-        onClick={() =>setOpen(!open)}
+        onClick={() => setOpen(!open)}
         className=" inline-flex items-center p-2 justify-center text-sm text-gray-500 rounded-md md:hidden
         hover:bg-gray-100"
       >
@@ -58,30 +60,62 @@ const navlink = () => {
               Contact
             </Link>
           </li>
+
+          {session && (
+            <>
+              <li>
+                <Link
+                  href="/myreservation"
+                  className=" block py-2 px-3 text-gray-800 hover:text-orange-400 hover:bg-gray-100 rounded-sm md:hover:bg-transparent md:p-0"
+                >
+                  My Reservation
+                </Link>
+              </li>
+              {session.user.role === "admin" && (
+                <>
+                <li>
+                <Link
+                  href="/admin/dashboard"
+                  className=" block py-2 px-3 text-gray-800 hover:text-orange-400 hover:bg-gray-100 rounded-sm md:hover:bg-transparent md:p-0"
+                >
+                  Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/admin/room"
+                  className=" block py-2 px-3 text-gray-800 hover:text-orange-400 hover:bg-gray-100 rounded-sm md:hover:bg-transparent md:p-0"
+                >
+                  Manage Room
+                </Link>
+              </li>
+                </>
+              )}
+              
+            </>
+          )}
+
+          {session ? (
+          <li>
+            <button
+              onClick={() => signOut()}
+              className="md:hidden py-2.5  text-gray-50 bg-red-400 hover:bg-red-600 rounded-sm"
+            >
+              Signout
+            </button>
+          </li>
+          ) : (
           <li>
             <Link
-              href="/myreservation"
-              className=" block py-2 px-3 text-gray-800 hover:text-orange-400 hover:bg-gray-100 rounded-sm md:hover:bg-transparent md:p-0"
+              href="/signin"
+              className=" block py-2 px-3 text-gray-50 bg-orange-400 hover:bg-orange-300 rounded-sm"
             >
-              My Reservation
+              Signin
             </Link>
           </li>
-          <li>
-            <Link
-              href="/admin/dashboard"
-              className=" block py-2 px-3 text-gray-800 hover:text-orange-400 hover:bg-gray-100 rounded-sm md:hover:bg-transparent md:p-0"
-            >
-              Dashboard
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/admin/room"
-              className=" block py-2 px-3 text-gray-800 hover:text-orange-400 hover:bg-gray-100 rounded-sm md:hover:bg-transparent md:p-0"
-            >
-              Manage Room
-            </Link>
-          </li>
+          )}
+
+
         </ul>
       </div>
     </>
