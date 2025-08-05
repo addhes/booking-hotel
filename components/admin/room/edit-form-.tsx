@@ -4,14 +4,21 @@ import { Amenities } from "@prisma/client";
 import { type PutBlobResult } from "@vercel/blob";
 import Image from "next/image";
 import { useRef, useState, useTransition, useActionState } from "react";
-import { saveRoom } from "@/lib/action"; 
+import { updateRoom } from "@/lib/action"; 
 import { IoCloudUploadOutline, IoTrashOutline } from "react-icons/io5";
 import { BarLoader } from "react-spinners";
 import clsx from "clsx";
+import { RoomProps } from "@/types/room";
 
-const CreateFormRoom = ({amenities}: {amenities: Amenities[]}) => {
+const EditFormPage = ({
+  amenities,
+  room
+}: {
+  amenities: Amenities[],
+  room: RoomProps;
+}) => {
   const inputFileRef = useRef<HTMLInputElement>(null);
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(room.image);
   const [message, setMessage] = useState("");
   const [pending, startTransition] = useTransition();
 
@@ -54,7 +61,9 @@ const CreateFormRoom = ({amenities}: {amenities: Amenities[]}) => {
     });
   };
 
-  const [state, formAction, isPending] = useActionState(saveRoom.bind(null, image), null)
+  const [state, formAction, isPending] = useActionState(updateRoom.bind(null, image, room.id), null)
+
+  const checkedAmenities = room.RoomAmenities.map((item) => item.amenitiesId)
 
   return (
     <form action={formAction}>
@@ -62,6 +71,7 @@ const CreateFormRoom = ({amenities}: {amenities: Amenities[]}) => {
         <div className="col-span-8 bg-white p-4">
           <div className="mb-4">
             <input
+              defaultValue={room.name}
               type="text"
               name="name"
               className="py-2 px-4 rounded-sm border border-gray-400 w-full"
@@ -73,6 +83,7 @@ const CreateFormRoom = ({amenities}: {amenities: Amenities[]}) => {
           </div>
           <div className="mb-4">
             <textarea
+              defaultValue={room.description}
               name="description"
               rows={8}
               className="py-2 px-4 rounded-sm border border-gray-400 w-full
@@ -90,9 +101,11 @@ const CreateFormRoom = ({amenities}: {amenities: Amenities[]}) => {
                   defaultValue={item.id}
                   type="checkbox"
                   name="amenities"
+                  defaultChecked={checkedAmenities.includes(item.id)}
                   className="w-4 h-4 text-blue-600 bg-gray-100
                         border-gray-300 rounded"
                   placeholder="Room Name"
+
                 />
                 <label htmlFor="" className=" ms-2 text-sm font-medium text-gray-900 capitalize">
                   {item.name}
@@ -161,6 +174,7 @@ const CreateFormRoom = ({amenities}: {amenities: Amenities[]}) => {
           </label>
           <div className="mb-4">
             <input
+            defaultValue={room.capacity}
               type="text"
               name="capacity"
               className="py-2 px-4 rounded-sm border border-gray-400 w-full"
@@ -172,6 +186,7 @@ const CreateFormRoom = ({amenities}: {amenities: Amenities[]}) => {
           </div>
           <div className="mb-4">
             <input
+            defaultValue={room.price}
               type="text"
               name="price"
               className="py-2 px-4 rounded-sm border border-gray-400 w-full"
@@ -196,7 +211,7 @@ const CreateFormRoom = ({amenities}: {amenities: Amenities[]}) => {
             )}
               disabled={isPending}
           >
-            {isPending ? "Saving..." : "Save"}
+            {isPending ? "Updating..." : "Update"}
           </button>
         </div>
       </div>
@@ -204,4 +219,4 @@ const CreateFormRoom = ({amenities}: {amenities: Amenities[]}) => {
   );
 };
 
-export default CreateFormRoom;
+export default EditFormPage;

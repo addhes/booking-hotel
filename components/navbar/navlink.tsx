@@ -96,7 +96,7 @@ const navlink = () => {
           </li>
           <li>
             <Link
-              href="/rooms"
+              href="/room"
               className=" block py-2 px-3 text-gray-800 hover:text-orange-400 hover:bg-gray-100 rounded-sm md:hover:bg-transparent md:p-0"
             >
               Rooms
